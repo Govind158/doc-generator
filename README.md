@@ -10,9 +10,9 @@
 git clone --recursive https://github.com/finzzz/tldr
 ```
 
-3. Copy your documentation to manpages (it is ignored)
+2. Copy your documentation to manpages (it is ignored)
 
-4. Serve
+3. Serve
 
 ```
 python3 -m http.server
