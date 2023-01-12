@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="assets/css/monokai.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <title>TLDR</title>
+</head>
+<body>
+    <div>
+        <h1><a href="https://github.com/finzzz/tldr">TLDR</a></h1>
+        <p>Minimalistic TLDR Web Client</p>
+        <input type="text" id="command"/><button id=search_btn onclick="fetchIndex()">></button> 
+    </div>
+    <div id="osBtnDiv"></div>
+    <div id="content"></div>
+
+    <script src="assets/js/highlight.min.js"></script> <!-- https://highlightjs.org -->
+    <script src="assets/js/marked.min.js"></script> <!-- https://github.com/markedjs/marked -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
