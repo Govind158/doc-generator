@@ -1,61 +1,52 @@
 function loadContent() {
-  filteredLanguageList1();
+  filteredContentList();
+  let languageNav = "";
+  let languages = JSON.parse(localStorage.getItem("language_set"));
+  let content = JSON.parse(localStorage.getItem("contentSet"));
+  console.log(languages);
+  let defaultLanguage = "en";
+  for(let i=0; i<languages.length;i++){
+    languageNav += `<li class="nav-item my-1 p-2 highlight"><a type="button" id="`+ languages[i] +`" onClick="fetchTitle(this.id)">`+ languages[i] +`</a ></li>`;
+  }
+  document.getElementById('lang-id').innerHTML = languageNav;
+  langBasedDocumentation();
+}
+
+function filteredContentList(){
+  let unfilteredLanguage_set = [];
+  let unfilteredLanguage = "";
+  let language_set = [];
+  fetch('./index.json').then(response => {
+    return response.json();
+  }).then(data => {
+  let contentSet = [];
+  for(let i=0; i < data.commands.length; i++){
+    for(let j=0; j < data.commands[i].targets.length; j++){
+      data.commands[i].targets[j].name = data.commands[i].name;
+      contentSet.push(data.commands[i].targets[j]);
+    }
   }
 
-// async function filteredLanguageList(){
-//   let unfilteredLanguage_set = [];
-//   let language_set = [];
-//   try{
-//     let response = await fetch('./index.json');
-//     let docList = await response.json();
-//     for (let i = 0; i < docList.commands.length; i++) {
-//       for (let j = 0; j < docList.commands[i].language.length; j++){
-//         unfilteredLanguage_set.push(docList.commands[i].language[j]);
-//       }
-//     }
-//     language_set = removeDuplicates(unfilteredLanguage_set);
-//     return language_set;
-//   }
-//   catch{
-//     alert('error');
-//   }
-// }
+  for(let i = 0; i < contentSet.length; i++){
+    unfilteredLanguage = contentSet[i].language;
+    unfilteredLanguage_set.push(unfilteredLanguage);
+  }
+  language_set = removeDuplicates(unfilteredLanguage_set);
+  localStorage.setItem("language_set", JSON.stringify(language_set));
+  localStorage.setItem("contentSet", JSON.stringify(contentSet));
+  });
+}
 
 function removeDuplicates(languageArray) {
   return languageArray.filter((item,
       index) => languageArray.indexOf(item) === index);
 }
 
-  function filteredLanguageList1(){
-  let unfilteredLanguage_set = [];
-  let language_set = [];
-  contentLangSet ={};
-  let docList = {};
-  fetch('./index.json').then(response => {
-    return response.json();
-  }).then(data => {
-    for (let i = 0; i < data.commands.length; i++) {
-      for (let j = 0; j < data.commands[i].language.length; j++){
-        unfilteredLanguage_set.push(data.commands[i].language[j]);
-      }
-    }
-  let docuLength = data.commands.length;
-  language_set = removeDuplicates(unfilteredLanguage_set);
-  for (let i = 0; i < language_set.length; i++) {
-    for (let j = 0; j < docuLength; j++) {
-      for(let k = 0; k < data.commands[j].targets.length; k++){
-        if(data.commands[j].targets[k].language ===  language_set[i]){
-          contentLangSet[i].language = language_set[i];
-          contentLangSet[i].targets.platform = data.commands[j].targets[k].platform;
-          contentLangSet[i].targets.title = data.commands[j].name;
-          docList.push(contentLangSet[i])
-        }
-      }
-      console.log(docList);
-      // console.log(data.commands[j].target);
+function langBasedDocumentation(language){
+  let content = JSON.parse(localStorage.getItem("contentSet"));
+  for(let i=0; i<content.length;i++){
+    if(content[i].language === language){
+      
     }
   }
-  });
 }
-
-

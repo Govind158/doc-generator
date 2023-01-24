@@ -67,3 +67,8 @@ code.hljs {
 .form-control{
     border-color: #356bc3;
 }
+.scroll{
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}
