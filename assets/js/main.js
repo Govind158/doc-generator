@@ -9,7 +9,7 @@ function loadContent() {
     languageNav += `<li class="nav-item my-1 p-2 highlight"><a type="button" id="`+ languages[i] +`" onClick="fetchTitle(this.id)">`+ languages[i] +`</a ></li>`;
   }
   document.getElementById('lang-id').innerHTML = languageNav;
-  langBasedDocumentation();
+  langBasedDocumentation(defaultLanguage);
 }
 
 function filteredContentList(){
@@ -44,9 +44,46 @@ function removeDuplicates(languageArray) {
 
 function langBasedDocumentation(language){
   let content = JSON.parse(localStorage.getItem("contentSet"));
+  let platformUnSortedList = [];
   for(let i=0; i<content.length;i++){
     if(content[i].language === language){
-      
+      platformUnSortedList.push(content[i].os);
     }
   }
+  let platformList = removeDuplicates(platformUnSortedList);
+  const selectAccordion  = document.getElementById('sideNavAccordion'); 
+  const headFragment = document.createDocumentFragment();
+  for(let i=0; i<platformList.length;i++){
+      let accordItem = document.createElement('div');
+      accordItem.classList.add('accordion-item');
+      let accordTitle = document.createElement('h2');
+      accordTitle.classList.add('accordion-header');
+      accordTitle.setAttribute('id', 'flush-heading'+i);
+      const platformButton = document.createElement('button')
+      platformButton.classList.add('accordion-button', 'collapsed');
+      platformButton.setAttribute('type', 'button');
+      platformButton.setAttribute('data-bs-toggle', 'collapse');
+      platformButton.setAttribute('data-bs-target', '#'+platformList[i]);
+      platformButton.setAttribute('aria-expanded', 'false');
+      platformButton.setAttribute('aria-controls', platformList[i]);
+      platformButton.textContent = platformList[i];
+      accordTitle.appendChild(platformButton);
+      let accordCollapse = document.createElement('div');
+      accordCollapse.classList.add('accordion-collapse', 'collapse');
+      accordCollapse.setAttribute('id', platformList[i]);
+      accordCollapse.setAttribute('aria-labelledby', 'flush-heading'+i);
+      accordCollapse.setAttribute('data-bs-parent', '#sideNavAccordion');
+      for(let j=0; j<content.length;j++){
+        if(content[j].os === platformList[i] && content[j].language === language){
+          let accordBody= document.createElement('div');
+          accordBody.classList.add('accordion-body');
+          accordBody.textContent = content[j].name;
+          accordCollapse.appendChild(accordBody);
+        }
+      }
+      accordItem.appendChild(accordTitle);
+      accordItem.appendChild(accordCollapse);
+      headFragment.appendChild(accordItem);
+  }
+  selectAccordion.appendChild(headFragment);
 }
