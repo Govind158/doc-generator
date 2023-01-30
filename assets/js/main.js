@@ -1,15 +1,67 @@
+//Initial content
 function loadContent() {
   filteredContentList();
-  let languageNav = "";
   let languages = JSON.parse(localStorage.getItem("language_set"));
   let content = JSON.parse(localStorage.getItem("contentSet"));
-  console.log(languages);
-  let defaultLanguage = "en";
-  for(let i=0; i<languages.length;i++){
-    languageNav += `<li class="nav-item my-1 p-2 highlight"><a type="button" id="`+ languages[i] +`" onClick="fetchTitle(this.id)">`+ languages[i] +`</a ></li>`;
+  if(localStorage.getItem("defaultLanguage") === null){
+    localStorage.setItem('defaultLanguage', 'en');
   }
-  document.getElementById('lang-id').innerHTML = languageNav;
-  langBasedDocumentation(defaultLanguage);
+  if(localStorage.getItem("defaultPlatform") === null){
+    localStorage.setItem('defaultPlatform', content[0].os);
+  }
+  if(localStorage.getItem("defaultTitle") === null){
+    localStorage.setItem('defaultTitle', content[0].name);
+  }
+  let defaultLanguage = localStorage.getItem("defaultLanguage");
+  let defaultPlatform = localStorage.getItem("defaultPlatform");
+  let defaultTitle = localStorage.getItem("defaultTitle");
+  console.log(defaultLanguage, defaultPlatform, defaultTitle);
+  const langOption = document.getElementById('langSelect');
+  const langFragment = document.createDocumentFragment();
+  for(let i=0; i<languages.length; i++){
+    let langListItem = document.createElement('option');
+    langListItem.classList.add('accordion-item');
+    langListItem.setAttribute('value', languages[i]);
+    if(languages[i] === defaultLanguage){
+      langListItem.selected = true;
+    }
+    langListItem.textContent = languages[i];
+    langFragment.appendChild(langListItem);
+  }
+  langOption.appendChild(langFragment);
+  document.getElementById("langSelect").addEventListener("change", (e)=>
+    {
+      let langValue = e.target.value;
+      languageListner(langValue);
+    }
+  ); 
+  langBasedNav(defaultLanguage);
+  showDocumetation(defaultTitle, defaultPlatform);
+  
+}
+function languageListner(language){
+  localStorage.setItem('defaultLanguage', language);
+  let defaultLanguage = localStorage.getItem("defaultLanguage");
+  langBasedNav(defaultLanguage);
+}
+
+function showDocumetation(name, platform){
+  localStorage.setItem('defaultPlatform', platform);
+  localStorage.setItem('defaultTitle', name);
+  let defaultLanguage = localStorage.getItem("defaultLanguage");
+  fetch("doc_files/pages."+defaultLanguage+"/"+platform+"/" + name + ".md")
+  .then((resp)=>{return resp.text()})
+  .then((text)=>{
+      document.getElementById('content').innerHTML = marked(text)
+      document.querySelectorAll('code').forEach((block) => { 
+        hljs.configure({
+              tabReplace: '    ',
+              languages: ["bash", "shell"],
+          })
+          hljs.highlightBlock(block) 
+      })
+  })  
+
 }
 
 function filteredContentList(){
@@ -42,7 +94,7 @@ function removeDuplicates(languageArray) {
       index) => languageArray.indexOf(item) === index);
 }
 
-function langBasedDocumentation(language){
+function langBasedNav(language){
   let content = JSON.parse(localStorage.getItem("contentSet"));
   let platformUnSortedList = [];
   for(let i=0; i<content.length;i++){
@@ -51,7 +103,8 @@ function langBasedDocumentation(language){
     }
   }
   let platformList = removeDuplicates(platformUnSortedList);
-  const selectAccordion  = document.getElementById('sideNavAccordion'); 
+  const selectAccordion  = document.getElementById('sideNavAccordion');
+  selectAccordion.innerHTML = '';
   const headFragment = document.createDocumentFragment();
   for(let i=0; i<platformList.length;i++){
       let accordItem = document.createElement('div');
@@ -59,7 +112,7 @@ function langBasedDocumentation(language){
       let accordTitle = document.createElement('h2');
       accordTitle.classList.add('accordion-header');
       accordTitle.setAttribute('id', 'flush-heading'+i);
-      const platformButton = document.createElement('button')
+      const platformButton = document.createElement('button');
       platformButton.classList.add('accordion-button', 'collapsed');
       platformButton.setAttribute('type', 'button');
       platformButton.setAttribute('data-bs-toggle', 'collapse');
@@ -69,7 +122,7 @@ function langBasedDocumentation(language){
       platformButton.textContent = platformList[i];
       accordTitle.appendChild(platformButton);
       let accordCollapse = document.createElement('div');
-      accordCollapse.classList.add('accordion-collapse', 'collapse');
+      accordCollapse.classList.add('accordion-collapse', 'collapse', 'accordion-height');
       accordCollapse.setAttribute('id', platformList[i]);
       accordCollapse.setAttribute('aria-labelledby', 'flush-heading'+i);
       accordCollapse.setAttribute('data-bs-parent', '#sideNavAccordion');
@@ -77,7 +130,20 @@ function langBasedDocumentation(language){
         if(content[j].os === platformList[i] && content[j].language === language){
           let accordBody= document.createElement('div');
           accordBody.classList.add('accordion-body');
-          accordBody.textContent = content[j].name;
+          let accordBodyTitle = document.createElement('a');
+          accordBodyTitle.classList.add('p-2', 'highlight');
+          accordBodyTitle.setAttribute('type','button');
+          accordBodyTitle.setAttribute('id', content[j].name);
+          accordBodyTitle.setAttribute('data-platform', platformList[i]);
+          accordBodyTitle.textContent = content[j].name;
+          accordBodyTitle.addEventListener("click", (e)=>
+          {
+            let selctedTitle = e.target.id;
+            let selectedPlatform = platformList[i];
+            showDocumetation(selctedTitle, selectedPlatform);
+          }
+        );
+          accordBody.appendChild(accordBodyTitle);
           accordCollapse.appendChild(accordBody);
         }
       }
@@ -87,3 +153,15 @@ function langBasedDocumentation(language){
   }
   selectAccordion.appendChild(headFragment);
 }
+
+// function findTitle2(findx){
+//   let content = JSON.parse(localStorage.getItem("contentSet"));
+//   let selectedLanguage = localStorage.getItem("defaultLanguage");
+//   let fetchedResult = [];
+//   for(let i=0; i< content.length; i++){
+//     if(content[i].name.includes(findx.value) && content[i].language == selectedLanguage){
+//       let result = {os: }
+//     }
+//   }
+// }
+      

@@ -73,7 +73,6 @@ async function findTitle(toFind){
             document.getElementById('search-results').innerHTML = searchResult;
         }
 }
-        
-      
+   
 
 
