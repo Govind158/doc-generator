@@ -14,11 +14,10 @@ function loadContent() {
   let defaultLanguage = localStorage.getItem("defaultLanguage");
   let defaultPlatform = localStorage.getItem("defaultPlatform");
   let defaultTitle = localStorage.getItem("defaultTitle");
-  console.log(defaultLanguage, defaultPlatform, defaultTitle);
   const langOption = document.getElementById("langSelect");
   const langFragment = document.createDocumentFragment();
   for (let i = 0; i < languages.length; i++) {
-    let langListItem = document.createElement("option");
+    let langListItem = document.createElement("option");~
     langListItem.classList.add("accordion-item");
     langListItem.setAttribute("value", languages[i]);
     if (languages[i] === defaultLanguage) {
