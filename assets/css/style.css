@@ -10,7 +10,7 @@ html, body {
 }
 
 /*------------NAV BAR----------------*/
-
+@media (min-width: 992px){
 .side-nav {
     background-color: #f4f4f4;
     height: 96%;
@@ -22,6 +22,7 @@ html, body {
     overflow-y: scroll;
 }
 
+}
 .highlight:hover {
     background-color: #4285f4;
     color: #fff;
@@ -76,4 +77,15 @@ code.hljs {
     height: 200px;
     overflow-y: scroll;
     overflow-x: hidden;
+}
+.btn-size{
+    font-size: 12px;
+}
+.btn-position{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#dowload-button{
+    color: #4285F4;
 }

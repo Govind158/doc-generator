@@ -1,19 +1,36 @@
 // Listen to page loading
   window.addEventListener("load", loadContent);
+  fetch(`./config.json`)
+  .then((response) => response.json())
+    .then((data) => {
+      const url = new URL(window.location.href);
+      if (localStorage.getItem("defaultLanguage") == null) {
+         if(url.searchParams.has('language')){
+          localStorage.setItem("defaultLanguage", url.searchParams.get('language'));
+        }else{
+          localStorage.setItem("defaultLanguage", data.defaultLanguage);
+        }
+      }
+      // localStorage.setItem("defaultLanguage", data.defaultLanguage);
+      localStorage.setItem("foldername", data.mdFoldername);
+      localStorage.setItem("downloadPDF", data.downloadPDF);
+      localStorage.setItem("indexJSON", data.indexJSON);
+    });
 
 //Content on loading the page
-function loadContent() {
-  const allLanguages = JSON.parse(localStorage.getItem("allLanguages"));
-
-  if (localStorage.getItem("defaultLanguage") === null) {
-    localStorage.setItem("defaultLanguage", "en");
-  }
+async function loadContent() {
+  
+  console.log(localStorage.getItem("defaultLanguage"));
   const defaultLanguage = localStorage.getItem("defaultLanguage");
-  sortedContentList(defaultLanguage);
+  console.log(defaultLanguage);
+  await sortedContentList(defaultLanguage);
+  const allLanguages = JSON.parse(localStorage.getItem("allLanguages"));
+  // console.log(allLanguages);
+  // Show language selection list
   const langOption = document.getElementById("langSelect");
   const langFragment = document.createDocumentFragment();
   for (let i = 0; i < allLanguages.length; i++) {
-    let langListItem = document.createElement("option");~
+    let langListItem = document.createElement("option");
     langListItem.classList.add("accordion-item");
     langListItem.setAttribute("value", allLanguages[i]);
     if (allLanguages[i] === defaultLanguage) {
@@ -27,18 +44,39 @@ function loadContent() {
     let langValue = e.target.value;
     languageListner(langValue);
   });
-  setUrl(defaultLanguage);
+  // Check if current url include any parameter
+  const url = new URL(window.location.href);
+  if (url.searchParams.has('language') && url.searchParams.has('platform') && url.searchParams.has('topic')) {
+    console.log("URL search working");
+    const language = url.searchParams.get('language');
+    const platform = url.searchParams.get('platform');
+    const topic = url.searchParams.get('topic');
+    searchUrl(language, platform, topic);
+  } else {
+    setUrl(defaultLanguage, null, null);
+  }
+  pdfDowload();
 }
+// Listen to language selection
 function languageListner(language) {
   localStorage.setItem("defaultLanguage", language);
-  let defaultLanguage = localStorage.getItem("defaultLanguage");
-  setUrl(defaultLanguage);
+  // let defaultLanguage = localStorage.getItem("defaultLanguage");
+  setUrl(language);
+}
+// Show result for url searchs
+function searchUrl(language, platform, filename){
+  localStorage.setItem("defaultLanguage", language);
+  const filenameWOExtension = filename.split(".").shift();
+  console.log(filenameWOExtension);
+  langBasedNav(language);
+  showDocumetation(language, platform, filenameWOExtension);
 }
 
+// Show result for direct page visit
 function setUrl(language, platform, filename){
   var base_url = window.location.origin;
   console.log(base_url);
-  if(platform === undefined && filename === undefined){
+  if(platform == null && filename == null){
     const topic = 'index';
     let url = new URL(base_url);
     var search_params = url.searchParams;
@@ -51,6 +89,7 @@ function setUrl(language, platform, filename){
     showDocumetation(language, null, topic);
   }
   else{
+    // Update url after navigation click
     let url = new URL(base_url);
     var search_params = url.searchParams;
     search_params.append('language', language);
@@ -63,10 +102,12 @@ function setUrl(language, platform, filename){
     showDocumetation(language, platform, filename);
   }
 }
+// Show documentation of titles
 async function showDocumetation(language, platform, topic) {
+  const folderName = localStorage.getItem("foldername");
   const platformName = platform === null? '': `${platform}/`;
   try {
-    const resp = await fetch(`manpages/pages.${language}/${platformName}${topic}.md`);
+    const resp = await fetch(`${folderName}/pages.${language}/${platformName}${topic}.md`);
     const text = await resp.text();
     document.getElementById("content").innerHTML = marked(text);
     document.querySelectorAll("code").forEach((block) => {
@@ -81,15 +122,16 @@ async function showDocumetation(language, platform, topic) {
     console.error(error);
   }
 }
-// Convert JSon file to preffered array
+// Convert JSon file to preffered array format
 async function sortedContentList(language){
+  const indexJSON = localStorage.getItem("indexJSON");
   let unfilteredPlatformSet = [];
   let unfilteredPlatform = [];
   let platformUniqueSet = [];
   let unfilteredLanguage_set = [];
   let unfilteredLanguage = "";
   let allLanguages = [];
-  const response = await fetch("./index.json")
+  const response = await fetch(indexJSON)
   const data = await response.json();
   console.log(data);
   const contentSet = [];
@@ -112,8 +154,8 @@ async function sortedContentList(language){
   platformUniqueSet = removeDuplicates(unfilteredPlatform);
   allLanguages = removeDuplicates(unfilteredLanguage_set);
   const displayData = [];
-  platformArray = [];
-  titleList = [];
+  const platformArray = [];
+  const titleList = [];
   for(const platform of platformUniqueSet){
     for(const content of filteredContent){
       if(content.os === platform){
@@ -132,13 +174,13 @@ async function sortedContentList(language){
   localStorage.setItem("contentSet", JSON.stringify(displayData));
 
 }
-
+// Remove duplicates from the arrays of sortedContentList() function
 function removeDuplicates(unsortedArray) {
   return unsortedArray.filter(
     (item, index) => unsortedArray.indexOf(item) === index
   );
 }
-
+// Show side navigation section to display platform & topics
 function langBasedNav(language) {
   let content = JSON.parse(localStorage.getItem("contentSet"));
   if(content[0].language === language){
@@ -193,4 +235,48 @@ function langBasedNav(language) {
   }
   selectAccordion.appendChild(headFragment);
   }
+  console.log("Nav changed")
+}
+// Insert link to 'Save as PDF button'
+function pdfDowload(){
+  const downloadButton = document.getElementById('dowload-button')
+  const base_url = window.location.origin;
+  const downloadPDF = localStorage.getItem("downloadPDF");
+  downloadButton.href = `${base_url}${downloadPDF}`;
+}
+
+function findTitle(findx) {
+  let content = JSON.parse(localStorage.getItem("contentSet"));
+  let fetchedResults = [];
+  for (let i = 0; i < content[0].platforms.length; i++) {
+    for (let i = 0; i < content[0].platforms[i].items.length; j++) {
+      if (content[0].platforms[i].items[j].includes(findx)){
+        let result = {
+          os: content[0].platforms[i].name,
+          name: content[0].platforms[i].items[j]
+        };
+        fetchedResults.push(result);
+      }
+    }
+  }
+  console.log(fetchedResults);
+  // let searchResult = "";
+  // if (fetchedResults.length != 0) {
+  //   for (let j = 0; j < 5; j++) {
+  //     if (fetchedResults[j] !== undefined) {
+  //       searchResult +=
+  //         `<li>
+  //             <button type="button" id="` +
+  //         fetchedResults[j].name +
+  //         `">` +
+  //         fetchedResults[j].name +
+  //         `</button ></li>`;
+  //     }
+  //   }
+  //   document.getElementById("search-results").innerHTML = searchResult;
+  // } else {
+  //   searchResult = "No result found";
+  //   document.getElementById("search-results").innerHTML = searchResult;
+  // }
+  
 }

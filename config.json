@@ -1,0 +1,6 @@
+{   
+    "defaultLanguage": "en",
+    "mdFoldername": "./manpages",
+    "indexJSON": "./manpages/index.json",
+    "downloadPDF": "/manpages/docs.pdf"
+}
