@@ -1,25 +1,86 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-    <meta content="utf-8" http-equiv="encoding">
-    <link rel="icon" href="data:,">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/monokai.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/main.css">
-    <title>TLDR</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
-<body>
-    <div>
-        <h1><a href="https://github.com/finzzz/tldr">TLDR</a></h1>
-        <p>Minimalistic TLDR Web Client</p>
-        <input type="text" id="command"/><button id=search_btn onclick="fetchIndex()">></button> 
-    </div>
-    <div id="osBtnDiv"></div>
-    <div id="content"></div>
+  <body style="padding-top: 88px;">
+      <nav class="navbar navbar-expand-lg bg-light fixed-top border-bottom py-2">
+        <div class="container">
+          <a class="navbar-brand pr-4 m-0" href="">Logo</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item m-2">
+                <div class="form-group has-search">
+                  <span class="fa fa-search form-control-feedback"></span>
+                  <input type="text" class="form-control" placeholder="Search.."data-bs-toggle="modal" data-bs-target="#searchModal"">
+                </div>
+              </li>
+              <li class="nav-item dropdown m-2">
+                <select class="form-select" id="langSelect" aria-label="Default select example"></select>
+              </li>
+              <li class="nav-item m-2 btn-position">
+                <a class="" id="dowload-button" download>Save as PDF<i class="fa-solid fa-file-arrow-down btn-size mx-1"></i></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
 
-    <script src="assets/js/highlight.min.js"></script> <!-- https://highlightjs.org -->
-    <script src="assets/js/marked.min.js"></script> <!-- https://github.com/markedjs/marked -->
-    <script src="assets/js/app.js"></script>
-</body>
+      <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-3">
+              <!-- <a class="btn btn-primary sideNavbutton" data-bs-toggle="collapse" href="#collapseSideNav" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Show Content
+              </a> -->
+                <div class="sideNavdisplay side-nav">
+                  <div class="container p-4 my-3">
+                    <h2>Content</h2>
+                    <hr>
+                    <div class="accordion accordion-flush" id="sideNavAccordion"></div>
+                  </div>
+                </div>
+            </div>
+      
+            <div class="col-lg-9">
+                <main id="content"></main> 
+                <hr>   
+                <main id="elements"></main>
+            </div>
+          </div>
+      </div>
+
+      <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <input type="text" class="form-control" placeholder="Type here.."  onkeyup="findTitle(this)" autofocus>
+            </div>
+            <div class="modal-body">
+              <ul id="search-results">
+
+              </ul>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>   
+
+
+      <script src="assets/js/highlight.min.js"></script> <!-- https://highlightjs.org -->
+      <script src="assets/js/marked.min.js"></script> <!-- https://github.com/markedjs/marked -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+      <script type="module" src="assets/js/main.js"></script>
+  </body>
 </html>
